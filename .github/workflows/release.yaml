@@ -163,7 +163,7 @@ jobs:
 
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@v0
-        if: matrix.config.os != 'macos-latest' || matrix.config.arch != 'aarch64'
+        if: matrix.config.os != 'macos-latest' || matrix.config.arch != 'x86_64'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -172,15 +172,15 @@ jobs:
           tauriScript: cargo tauri
           updaterJsonPreferNsis: true
 
-      - name: Build Tauri App (macOS aarch64)
+      - name: Build Tauri App (macOS x86_64)
         uses: tauri-apps/tauri-action@v0
-        if: matrix.config.os == 'macos-latest' && matrix.config.arch == 'aarch64'
+        if: matrix.config.os == 'macos-latest' && matrix.config.arch == 'x86_64'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           releaseBody: ${{ needs.create-release.outputs.release_body }}
-          args: --target aarch64-apple-darwin
+          args: --target x86_64-apple-darwin
           tauriScript: cargo tauri
           updaterJsonPreferNsis: true
 
