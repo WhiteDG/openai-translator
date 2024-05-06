@@ -337,7 +337,8 @@ pub fn build_window<'a, R: tauri::Runtime, M: tauri::Manager<R>>(
 
 #[tauri::command]
 pub async fn show_translator_window_command() {
-    show_translator_window(false, false, true);
+    let window = show_translator_window(false, false, true);
+    window.set_focus().unwrap();
 }
 
 pub fn show_translator_window(

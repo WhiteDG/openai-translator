@@ -42,6 +42,13 @@ export function Window(props: IWindowProps) {
                 if (isTauri()) {
                     setShowSettings((prevIsVisible) => !prevIsVisible)
                 }
+            } else {
+                if (event.key === 'Escape') {
+                    event.preventDefault()
+                    if (isTauri()) {
+                        invoke('hide_translator_window')
+                    }
+                }
             }
         }
 

@@ -750,9 +750,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         const onCompositionStart = () => {
             isCompositing.current = true
+            editor.removeEventListener('keydown', onKeydown)
         }
         const onCompositionEnd = () => {
             isCompositing.current = false
+            setTimeout(() => {
+                editor.addEventListener('keydown', onKeydown)
+            }, 0)
         }
         const onMouseUp = () => {
             if (editor.selectionStart === 0 && editor.selectionEnd === editor.value.length) {
@@ -766,17 +770,28 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
         }
         const onBlur = onMouseUp
+        const onKeydown = async (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                event.preventDefault()
+                if (isTauri()) {
+                    const { invoke } = await import('@tauri-apps/api/core')
+                    invoke('hide_translator_window')
+                }
+            }
+        }
 
         editor.addEventListener('compositionstart', onCompositionStart)
         editor.addEventListener('compositionend', onCompositionEnd)
         editor.addEventListener('mouseup', onMouseUp)
         editor.addEventListener('blur', onBlur)
+        editor.addEventListener('keydown', onKeydown)
 
         return () => {
             editor.removeEventListener('compositionstart', onCompositionStart)
             editor.removeEventListener('compositionend', onCompositionEnd)
             editor.removeEventListener('mouseup', onMouseUp)
             editor.removeEventListener('blur', onBlur)
+            editor.removeEventListener('keydown', onKeydown)
         }
     }, [isTranslate])
 
@@ -1732,7 +1747,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 if (actionID === '__manager__') {
                                                     if (isTauri()) {
                                                         const { invoke } = await import('@tauri-apps/api/core')
-                                                        await invoke('show_action_manager_window')
+                                                        invoke('show_action_manager_window')
                                                     } else {
                                                         setShowActionManager(true)
                                                     }
