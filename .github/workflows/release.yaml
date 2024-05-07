@@ -96,9 +96,9 @@ jobs:
           - os: macos-13
             arch: x86_64
             rust_target: x86_64-apple-darwin
-          - os: macos-latest
-            arch: aarch64
-            rust_target: aarch64-apple-darwin
+          # - os: macos-latest
+          #   arch: aarch64
+          #   rust_target: aarch64-apple-darwin
           # - os: windows-latest
           #   arch: x86_64
           #   rust_target: x86_64-pc-windows-msvc
@@ -172,17 +172,17 @@ jobs:
           tauriScript: cargo tauri
           updaterJsonPreferNsis: true
 
-      - name: Build Tauri App (macOS aarch64)
-        uses: tauri-apps/tauri-action@v0
-        if: matrix.config.os == 'macos-latest' && matrix.config.arch == 'aarch64'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          releaseId: ${{ needs.create-release.outputs.release_id }}
-          releaseBody: ${{ needs.create-release.outputs.release_body }}
-          args: --target aarch64-apple-darwin
-          tauriScript: cargo tauri
-          updaterJsonPreferNsis: true
+      # - name: Build Tauri App (macOS aarch64)
+      #   uses: tauri-apps/tauri-action@v0
+      #   if: matrix.config.os == 'macos-latest' && matrix.config.arch == 'aarch64'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     releaseId: ${{ needs.create-release.outputs.release_id }}
+      #     releaseBody: ${{ needs.create-release.outputs.release_body }}
+      #     args: --target aarch64-apple-darwin
+      #     tauriScript: cargo tauri
+      #     updaterJsonPreferNsis: true
 
   # build-clip-extension:
   #   runs-on: ubuntu-22.04
