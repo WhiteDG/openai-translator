@@ -1521,10 +1521,15 @@ export function InnerSettings({
                         disable: autostartDisable,
                         isEnabled: autostartIsEnabled,
                     } = await import('@tauri-apps/plugin-autostart')
+                    const enabled = await autostartIsEnabled()
                     if (data.runAtStartup) {
-                        await autostartEnable()
+                        if (!enabled) {
+                            await autostartEnable()
+                        }
                     } else {
-                        await autostartDisable()
+                        if (enabled) {
+                            await autostartDisable()
+                        }
                     }
                     data.runAtStartup = await autostartIsEnabled()
                 } catch (e) {
