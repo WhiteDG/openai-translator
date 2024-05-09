@@ -12,7 +12,7 @@ import { useSettings } from '../../common/hooks/useSettings'
 import { setupAnalysis } from '../../common/analysis'
 import { Window } from '../components/Window'
 import { setExternalOriginalText } from '../../common/store'
-import { getCurrent } from '@tauri-apps/api/webviewWindow'
+import { getCurrent, getAll } from '@tauri-apps/api/webviewWindow'
 import { usePinned } from '../../common/hooks/usePinned'
 import { useMemoWindow } from '../../common/hooks/useMemoWindow'
 import { isMacOS } from '@/common/utils'
@@ -174,7 +174,9 @@ export function TranslatorWindow() {
         let timer: number | undefined = undefined
         appWindow
             .onFocusChanged(({ payload: focused }) => {
-                if (!pinned && settings.autoHideWindowWhenOutOfFocus) {
+                const allWindows = getAll()
+                const actionManagerWindowVisible = allWindows.map((window) => window.label).includes('action_manager')
+                if (!actionManagerWindowVisible && !pinned && settings.autoHideWindowWhenOutOfFocus) {
                     if (timer) {
                         clearTimeout(timer)
                     }

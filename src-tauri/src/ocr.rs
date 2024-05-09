@@ -152,7 +152,7 @@ pub fn do_ocr() -> Result<(), Box<dyn std::error::Error>> {
         // get output content
         let content = String::from_utf8_lossy(&output.stdout);
         crate::utils::send_text(content.to_string());
-        let mut window = crate::windows::show_translator_window(false, true, false);
+        let window = crate::windows::show_translator_window(false, true, false);
         window.set_focus().unwrap();
         Ok(())
     } else {
