@@ -491,6 +491,7 @@ pub fn show_settings_window() {
     let window = get_settings_window();
     window.center().unwrap();
     window.show().unwrap();
+    window.set_focus().unwrap();
 }
 
 pub fn get_settings_window() -> tauri::WebviewWindow {
