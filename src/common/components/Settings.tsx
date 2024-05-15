@@ -2404,7 +2404,12 @@ export function InnerSettings({
                                 label={t('API Model')}
                                 required={values.provider === 'Gemini'}
                             >
-                                <APIModelSelector provider='Gemini' currentProvider={values.provider} onBlur={onBlur} />
+                                <APIModelSelector
+                                    provider='Gemini'
+                                    currentProvider={values.provider}
+                                    apiKey={values.geminiAPIKey}
+                                    onBlur={onBlur}
+                                />
                             </FormItem>
                         </div>
                         <div
