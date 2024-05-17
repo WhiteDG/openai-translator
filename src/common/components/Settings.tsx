@@ -2431,7 +2431,12 @@ export function InnerSettings({
                                 />
                             </FormItem>
                             <FormItem name='apiModel' label={t('API Model')} required={values.provider === 'OpenAI'}>
-                                <APIModelSelector provider='OpenAI' currentProvider={values.provider} onBlur={onBlur} />
+                                <APIModelSelector
+                                    provider='OpenAI'
+                                    currentProvider={values.provider}
+                                    apiKey={values.apiKeys}
+                                    onBlur={onBlur}
+                                />
                             </FormItem>
                             <div
                                 style={{
@@ -2490,7 +2495,12 @@ export function InnerSettings({
                                 label={t('API Model')}
                                 required={values.provider === 'Azure'}
                             >
-                                <APIModelSelector provider='Azure' currentProvider={values.provider} onBlur={onBlur} />
+                                <APIModelSelector
+                                    provider='Azure'
+                                    currentProvider={values.provider}
+                                    apiKey={values.azureAPIKeys}
+                                    onBlur={onBlur}
+                                />
                             </FormItem>
                             <FormItem name='azureAPIURL' label={t('API URL')} required={values.provider === 'Azure'}>
                                 <Input size='compact' onBlur={onBlur} />
