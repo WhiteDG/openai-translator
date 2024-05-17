@@ -26,10 +26,11 @@ const useStyles = createUseStyles({
 
 export interface IIconPickerProps {
     value?: string
+    disabled?: boolean
     onChange?: (value: string) => void
 }
 
-export function IconPicker({ value, onChange }: IIconPickerProps) {
+export function IconPicker({ value, disabled, onChange }: IIconPickerProps) {
     const { t } = useTranslation()
     const [showIcons, setShowIcons] = useState(false)
     const [currentValue, setCurrentValue] = useState(value ?? 'MdMusicVideo')
@@ -62,6 +63,7 @@ export function IconPicker({ value, onChange }: IIconPickerProps) {
     return (
         <div className={styles.root}>
             <Button
+                disabled={disabled}
                 size='mini'
                 kind='primary'
                 onClick={(e) => {

@@ -3,7 +3,7 @@ import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { listen, Event } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core'
-import { bindDisplayWindowHotkey, bindHotkey, bindOCRHotkey, bindWritingHotkey } from '../utils'
+import { bindActionHotkey, bindDisplayWindowHotkey, bindHotkey, bindOCRHotkey, bindWritingHotkey } from '../utils'
 import { v4 as uuidv4 } from 'uuid'
 import { PREFIX } from '../../common/constants'
 import { translate } from '../../common/translate'
@@ -16,6 +16,8 @@ import { getCurrent, getAll } from '@tauri-apps/api/webviewWindow'
 import { usePinned } from '../../common/hooks/usePinned'
 import { useMemoWindow } from '../../common/hooks/useMemoWindow'
 import { isMacOS } from '@/common/utils'
+import { actionService } from '@/common/services/action'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 const engine = new Styletron({
     prefix: `${PREFIX}-styletron-`,
@@ -198,13 +200,20 @@ export function TranslatorWindow() {
             unlisten?.()
         }
     }, [pinned, settings.autoHideWindowWhenOutOfFocus])
-
+    const actions = useLiveQuery(() => actionService.list())
     useEffect(() => {
         bindHotkey()
         bindDisplayWindowHotkey()
         bindOCRHotkey()
         bindWritingHotkey()
     }, [])
+    useEffect(() => {
+        actions?.forEach((action) => {
+            if (action.hotkey) {
+                bindActionHotkey(action)
+            }
+        })
+    }, [actions])
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 

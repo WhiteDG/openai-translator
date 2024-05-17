@@ -426,3 +426,10 @@ pub fn show() {
         None => {}
     }
 }
+
+pub fn send_action(action_id: String) {
+    match APP_HANDLE.get() {
+        Some(handle) => handle.emit("change-action", action_id).unwrap_or_default(),
+        None => {}
+    }
+}

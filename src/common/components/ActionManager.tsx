@@ -305,7 +305,6 @@ export function ActionManager({ draggable = true }: IActionManagerProps) {
                                 <Button
                                     size='mini'
                                     startEnhancer={<FiEdit size={12} />}
-                                    disabled={!!action.mode}
                                     onClick={(e) => {
                                         e.preventDefault()
                                         e.stopPropagation()

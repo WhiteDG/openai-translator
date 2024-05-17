@@ -638,6 +638,28 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const [activateAction, setActivateAction] = useState<Action>()
 
+    useEffect(() => {
+        let unlisten: (() => void) | undefined = undefined
+        ;(async () => {
+            unlisten = await listen('change-action', async (event: Event<string>) => {
+                let action: Action | undefined
+                const actionId = parseInt(event.payload, 10)
+                if (actionId === activateAction?.id) {
+                    return
+                }
+                if (actionId === 0) {
+                    action = await actionService.getByMode(settings.defaultTranslateMode)
+                } else {
+                    action = await actionService.get(actionId)
+                }
+                setActivateAction(action)
+            })
+        })()
+        return () => {
+            unlisten?.()
+        }
+    }, [activateAction?.id, settings.defaultTranslateMode])
+
     const currentTranslateMode = useMemo(() => {
         editorRef.current?.focus()
         if (!activateAction) {
@@ -777,16 +799,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         if (!editor) {
             return undefined
         }
-        const onCompositionStart = () => {
-            isCompositing.current = true
-            editor.removeEventListener('keydown', onKeydown)
-        }
-        const onCompositionEnd = () => {
-            isCompositing.current = false
-            setTimeout(() => {
-                editor.addEventListener('keydown', onKeydown)
-            }, 0)
-        }
         const onMouseUp = () => {
             if (editor.selectionStart === 0 && editor.selectionEnd === editor.value.length) {
                 setSelectedWord('')
@@ -799,6 +811,31 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             }
         }
         const onBlur = onMouseUp
+
+        editor.addEventListener('mouseup', onMouseUp)
+        editor.addEventListener('blur', onBlur)
+
+        return () => {
+            editor.removeEventListener('mouseup', onMouseUp)
+            editor.removeEventListener('blur', onBlur)
+        }
+    }, [isTranslate])
+
+    useEffect(() => {
+        const editor = editorRef.current
+        if (!editor) {
+            return undefined
+        }
+        const onCompositionStart = () => {
+            isCompositing.current = true
+            editor.removeEventListener('keydown', onKeydown)
+        }
+        const onCompositionEnd = () => {
+            isCompositing.current = false
+            setTimeout(() => {
+                editor.addEventListener('keydown', onKeydown)
+            }, 50)
+        }
         const onKeydown = async (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 event.preventDefault()
@@ -808,21 +845,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                 }
             }
         }
-
         editor.addEventListener('compositionstart', onCompositionStart)
         editor.addEventListener('compositionend', onCompositionEnd)
-        editor.addEventListener('mouseup', onMouseUp)
-        editor.addEventListener('blur', onBlur)
         editor.addEventListener('keydown', onKeydown)
-
         return () => {
             editor.removeEventListener('compositionstart', onCompositionStart)
             editor.removeEventListener('compositionend', onCompositionEnd)
-            editor.removeEventListener('mouseup', onMouseUp)
-            editor.removeEventListener('blur', onBlur)
             editor.removeEventListener('keydown', onKeydown)
         }
-    }, [isTranslate])
+    }, [])
 
     const { theme, themeType } = useTheme()
 

@@ -12,6 +12,9 @@ import { IThemedStyleProps } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { IconPicker } from './IconPicker'
 import { RenderingFormatSelector } from './RenderingFormatSelector'
+import HotkeyRecorder from './HotKeyRecorder'
+import { bindActionHotkey } from '@/tauri/utils'
+import { builtinActionModes } from '../constants'
 
 const useStyles = createUseStyles({
     placeholder: (props: IThemedStyleProps) => ({
@@ -49,15 +52,21 @@ export function ActionForm(props: IActionFormProps) {
 
     const [loading, setLoading] = useState(false)
 
+    const isBuiltinAction =
+        props.action && builtinActionModes.map((builtinAction) => builtinAction.name).includes(props.action.name)
+
     const onSubmit = useCallback(
         async (values: ICreateActionOption) => {
             setLoading(true)
+            let prevAction: Action | undefined
             let action: Action
             if (props.action) {
+                prevAction = await actionService.get(props.action.id as number)
                 action = await actionService.update(props.action, values)
             } else {
                 action = await actionService.create(values)
             }
+            bindActionHotkey(action, prevAction?.hotkey)
             props.onSubmit(action)
             setLoading(false)
         },
@@ -128,41 +137,48 @@ export function ActionForm(props: IActionFormProps) {
     return (
         <Form initialValues={values} onValuesChange={handleValuesChange} onFinish={onSubmit}>
             <FormItem required name='name' label={t('Name')}>
-                <Input size='compact' />
+                <Input size='compact' disabled={isBuiltinAction} />
             </FormItem>
             <FormItem required name='icon' label={t('Icon')}>
-                <IconPicker />
+                <IconPicker disabled={isBuiltinAction} />
             </FormItem>
-            <FormItem required name='rolePrompt' label={t('Role Prompt')} caption={rolePromptCaption}>
-                <Textarea
-                    rows={4}
-                    overrides={{
-                        Root: {
-                            style: {
-                                width: '100%',
-                            },
-                        },
-                    }}
-                    size='compact'
-                    resize='vertical'
-                />
-            </FormItem>
-            <FormItem required name='commandPrompt' label={t('Command Prompt')} caption={commandPromptCaption}>
-                <Textarea
-                    rows={4}
-                    overrides={{
-                        Root: {
-                            style: {
-                                width: '100%',
-                            },
-                        },
-                    }}
-                    size='compact'
-                    resize='vertical'
-                />
-            </FormItem>
-            <FormItem name='outputRenderingFormat' label={t('Output rendering format')}>
-                <RenderingFormatSelector />
+            {!isBuiltinAction && (
+                <div>
+                    <FormItem required name='rolePrompt' label={t('Role Prompt')} caption={rolePromptCaption}>
+                        <Textarea
+                            rows={4}
+                            overrides={{
+                                Root: {
+                                    style: {
+                                        width: '100%',
+                                    },
+                                },
+                            }}
+                            size='compact'
+                            resize='vertical'
+                        />
+                    </FormItem>
+                    <FormItem required name='commandPrompt' label={t('Command Prompt')} caption={commandPromptCaption}>
+                        <Textarea
+                            rows={4}
+                            overrides={{
+                                Root: {
+                                    style: {
+                                        width: '100%',
+                                    },
+                                },
+                            }}
+                            size='compact'
+                            resize='vertical'
+                        />
+                    </FormItem>
+                    <FormItem name='outputRenderingFormat' label={t('Output rendering format')}>
+                        <RenderingFormatSelector />
+                    </FormItem>
+                </div>
+            )}
+            <FormItem name='hotkey' label={t('Hotkey')}>
+                <HotkeyRecorder testId='action-hotkey-recorder' />
             </FormItem>
             <div
                 style={{

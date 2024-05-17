@@ -9,6 +9,7 @@ export interface ICreateActionOption {
     rolePrompt?: string
     commandPrompt?: string
     outputRenderingFormat?: ActionOutputRenderingFormat
+    hotkey?: string
 }
 
 export interface IUpdateActionOption {
@@ -51,6 +52,7 @@ class ActionInternalService implements IActionInternalService {
                 rolePrompt: opt.rolePrompt,
                 commandPrompt: opt.commandPrompt,
                 outputRenderingFormat: opt.outputRenderingFormat,
+                hotkey: opt.hotkey,
                 createdAt: now,
                 updatedAt: now,
             }

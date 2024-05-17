@@ -2,6 +2,7 @@ import { isRegistered, register, unregister } from '@tauri-apps/plugin-global-sh
 import { invoke } from '@tauri-apps/api/core'
 import { getSettings } from '@/common/utils'
 import { sendNotification } from '@tauri-apps/plugin-notification'
+import { Action } from '@/common/internal-services/db'
 
 const modifierKeys = [
     'OPTION',
@@ -44,7 +45,7 @@ export async function bindHotkey(oldHotKey?: string) {
         await unregister(settings.hotkey)
     }
     await register(settings.hotkey, () => {
-        invoke('show_translator_window_with_selected_text_command')
+        invoke('show_translator_window_with_selected_text_and_action_command', { actionId: '0' })
     }).then(() => {
         console.log('register hotkey success')
     })
@@ -116,5 +117,28 @@ export async function bindWritingHotkey(oldWritingHotKey?: string) {
         invoke('writing_command')
     }).then(() => {
         console.log('writing hotkey registered')
+    })
+}
+
+export async function bindActionHotkey(action: Action, oldActionHotKey?: string) {
+    if (oldActionHotKey && !isMissingNormalKey(oldActionHotKey) && (await isRegistered(oldActionHotKey))) {
+        await unregister(oldActionHotKey)
+    }
+    const newActionHotKey = action.hotkey
+    if (!newActionHotKey) return
+    if (isMissingNormalKey(newActionHotKey)) {
+        sendNotification({
+            title: 'Cannot bind hotkey',
+            body: `Hotkey must contain at least one normal key: ${newActionHotKey}`,
+        })
+        return
+    }
+    if (await isRegistered(newActionHotKey)) {
+        await unregister(newActionHotKey)
+    }
+    await register(newActionHotKey, () => {
+        invoke('show_translator_window_with_selected_text_and_action_command', { actionId: action.id?.toString() })
+    }).then(() => {
+        console.log('action hotkey registered')
     })
 }
