@@ -32,6 +32,7 @@ pub struct ProxyConfig {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
+    pub i18n: Option<String>,
     pub hotkey: Option<String>,
     pub display_window_hotkey: Option<String>,
     pub ocr_hotkey: Option<String>,

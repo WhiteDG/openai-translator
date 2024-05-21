@@ -1,0 +1,12 @@
+{
+    "_version": 1,
+    "Settings": "Settings",
+    "OCR": "OCR",
+    "Show": "Show",
+    "Hide": "Hide",
+    "Pin": "Pin",
+    "Unpin": "Unpin",
+    "Quit": "Quit",
+    "CheckForUpdates": "Check for updates",
+    "NewVersionAvailable": "💡 New version available!"
+}

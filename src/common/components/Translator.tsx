@@ -473,7 +473,7 @@ export interface IInnerTranslatorProps {
     containerStyle?: React.CSSProperties
     editorRows?: number
     showLogo?: boolean
-    onSettingsSave?: (oldSettings: ISettings) => void
+    onSettingsSave?: (oldSettings: ISettings, latestSettings: ISettings) => void
     onSettingsShow?: (isShow: boolean) => void
 }
 
@@ -1628,8 +1628,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         >
             {showSettings && (
                 <InnerSettings
-                    onSave={(oldSettings) => {
-                        props.onSettingsSave?.(oldSettings)
+                    onSave={(oldSettings, latestSettings) => {
+                        props.onSettingsSave?.(oldSettings, latestSettings)
                     }}
                     headerPromotionID={settingsHeaderPromotion?.id}
                     openaiAPIKeyPromotionID={openaiAPIKeyPromotion?.id}

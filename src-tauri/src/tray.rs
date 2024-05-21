@@ -20,12 +20,6 @@ pub(crate) struct PinnedEventPayload {
     pinned: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub(crate) struct HotkeyUpdatedEventPayload {
-    id: String,
-    hotkey: Option<String>,
-}
-
 pub static TRAY_EVENT_REGISTERED: AtomicBool = AtomicBool::new(false);
 
 pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
@@ -33,25 +27,25 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     let check_for_updates_i = MenuItem::with_id(
         app,
         "check_for_updates",
-        "Check for Updates...",
+        t!("CheckForUpdates"),
         true,
         None::<String>,
     )?;
     if let Some(Some(_)) = *UPDATE_RESULT.lock() {
         check_for_updates_i
-            .set_text("💡 New version available!")
+            .set_text(t!("NewVersionAvailable"))
             .unwrap();
     }
-    let settings_i = MenuItem::with_id(app, "settings", "Settings", true, Some("CmdOrCtrl+,"))?;
-    let ocr_i = MenuItem::with_id(app, "ocr", "OCR", true, config.ocr_hotkey)?;
-    let show_i = MenuItem::with_id(app, "show", "Show", true, config.display_window_hotkey)?;
-    let hide_i = PredefinedMenuItem::hide(app, Some("Hide")).unwrap();
-    let pin_i = MenuItem::with_id(app, "pin", "Pin", true, None::<String>)?;
+    let settings_i = MenuItem::with_id(app, "settings",t!("Settings"), true, Some("CmdOrCtrl+,"))?;
+    let ocr_i = MenuItem::with_id(app, "ocr", t!("OCR"), true, config.ocr_hotkey)?;
+    let show_i = MenuItem::with_id(app, "show", t!("Show"), true, config.display_window_hotkey)?;
+    let hide_i = PredefinedMenuItem::hide(app, Some(t!("Hide").as_ref())).unwrap();
+    let pin_i = MenuItem::with_id(app, "pin", t!("Pin"), true, None::<String>)?;
     if ALWAYS_ON_TOP.load(Ordering::Acquire) {
-        pin_i.set_text("Unpin").unwrap();
+        pin_i.set_text(t!("Unpin")).unwrap();
     }
     let separator_i = PredefinedMenuItem::separator(app).unwrap();
-    let quit_i = PredefinedMenuItem::quit(app, Some("Quit")).unwrap();
+    let quit_i = PredefinedMenuItem::quit(app, Some(t!("Quit").as_ref())).unwrap();
     
     let menu = Menu::with_items(
         app,
@@ -111,17 +105,10 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         ALWAYS_ON_TOP.store(payload.pinned, Ordering::Release);
         create_tray(&app_handle_clone).unwrap();
     });
-    
-    app_handle.listen_any("hotkey-updated", move |msg| {
-        let payload: HotkeyUpdatedEventPayload = serde_json::from_str(&msg.payload()).unwrap();
-        if let Some(position) = menu.items().unwrap_or_default().into_iter().position(|i| i.id() == payload.id) {
-            let menu_item_kind = menu.get(&payload.id).unwrap();
-            let menu_item =  menu_item_kind.as_menuitem().unwrap();
-            let _ = menu.remove(menu_item);
-            let _ = menu_item.set_accelerator(payload.hotkey);
-            let _ = menu.insert(menu_item, position);
-            let _ = tray.set_menu(Some(menu.clone()));
-        }
+
+    let app_handle_clone_0 = app.app_handle().clone();
+    app_handle.listen_any("refresh_menu", move |_event| {
+        create_tray(&app_handle_clone_0).unwrap();
     });
     Ok(())
 }

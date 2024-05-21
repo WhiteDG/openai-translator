@@ -1,0 +1,12 @@
+{
+    "_version": 1,
+    "Settings": "設定",
+    "OCR": "スクリーンショット OCR",
+    "Show": "ウィンドウを表示",
+    "Hide": "ウィンドウを非表示",
+    "Pin": "ウィンドウを固定",
+    "Unpin": "ウィンドウの固定を解除",
+    "Quit": "終了",
+    "CheckForUpdates": "更新を確認",
+    "NewVersionAvailable": "💡 新しいバージョンが見つかりました！"
+}

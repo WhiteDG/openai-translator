@@ -31,7 +31,7 @@ pub fn select_all(enigo: &mut Enigo) {
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn select_all(enigo: &mut Enigo) {
+pub fn select_all(_enigo: &mut Enigo) {
     let _guard = SELECT_ALL.lock();
 
     let apple_script = APP_HANDLE
@@ -61,7 +61,7 @@ pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
 }
 
 #[cfg(target_os = "macos")]
-pub fn left_arrow_click(enigo: &mut Enigo, n: usize) {
+pub fn left_arrow_click(_enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     let apple_script = APP_HANDLE
@@ -90,7 +90,7 @@ pub fn right_arrow_click(enigo: &mut Enigo, n: usize) {
 }
 
 #[cfg(target_os = "macos")]
-pub fn right_arrow_click(enigo: &mut Enigo, n: usize) {
+pub fn right_arrow_click(_enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     let apple_script = APP_HANDLE
@@ -119,7 +119,7 @@ pub fn backspace_click(enigo: &mut Enigo, n: usize) {
 }
 
 #[cfg(target_os = "macos")]
-pub fn backspace_click(enigo: &mut Enigo, n: usize) {
+pub fn backspace_click(_enigo: &mut Enigo, n: usize) {
     let _guard = INPUT_LOCK.lock();
 
     let apple_script = APP_HANDLE
@@ -179,7 +179,7 @@ pub fn copy(enigo: &mut Enigo) {
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn copy(enigo: &mut Enigo) {
+pub fn copy(_enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
     let apple_script = APP_HANDLE
@@ -214,7 +214,7 @@ pub fn paste(enigo: &mut Enigo) {
 
 #[allow(dead_code)]
 #[cfg(target_os = "macos")]
-pub fn paste(enigo: &mut Enigo) {
+pub fn paste(_enigo: &mut Enigo) {
     let _guard = COPY_PASTE.lock();
 
     let apple_script = APP_HANDLE

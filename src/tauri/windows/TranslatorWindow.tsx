@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
-import { listen, Event } from '@tauri-apps/api/event'
+import { listen, Event, emit } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core'
 import { bindActionHotkey, bindDisplayWindowHotkey, bindHotkey, bindOCRHotkey, bindWritingHotkey } from '../utils'
 import { v4 as uuidv4 } from 'uuid'
@@ -15,7 +15,7 @@ import { setExternalOriginalText } from '../../common/store'
 import { getCurrent, getAll } from '@tauri-apps/api/webviewWindow'
 import { usePinned } from '../../common/hooks/usePinned'
 import { useMemoWindow } from '../../common/hooks/useMemoWindow'
-import { isMacOS } from '@/common/utils'
+import { isMacOS, isTauri } from '@/common/utils'
 import { actionService } from '@/common/services/action'
 import { useLiveQuery } from 'dexie-react-hooks'
 
@@ -233,12 +233,18 @@ export function TranslatorWindow() {
                 defaultShowSettings
                 editorRows={10}
                 containerStyle={{ paddingTop: settings.enableBackgroundBlur ? '' : '26px' }}
-                onSettingsSave={(oldSettings) => {
+                onSettingsSave={(oldSettings, latestSettings) => {
                     invoke('clear_config_cache')
                     bindHotkey(oldSettings.hotkey)
                     bindDisplayWindowHotkey(oldSettings.displayWindowHotkey)
                     bindOCRHotkey(oldSettings.ocrHotkey)
                     bindWritingHotkey(oldSettings.writingHotkey)
+                    if (isTauri()) {
+                        if (latestSettings.i18n !== oldSettings.i18n) {
+                            invoke('update_locales', { locales: latestSettings.i18n })
+                        }
+                        emit('refresh_menu')
+                    }
                 }}
                 onSettingsShow={onSettingsShow}
             />

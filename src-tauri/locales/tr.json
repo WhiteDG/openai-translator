@@ -1,0 +1,12 @@
+{
+    "_version": 1,
+    "Settings": "Ayarlar",
+    "OCR": "Ekran Görüntüsü OCR",
+    "Show": "Pencereyi Göster",
+    "Hide": "Pencereyi Gizle",
+    "Pin": "Pencereyi Sabitle",
+    "Unpin": "Pencereyi Sabitlemeyi Kaldır",
+    "Quit": "Çıkış",
+    "CheckForUpdates": "Güncellemeleri Kontrol Et",
+    "NewVersionAvailable": "💡 Yeni sürüm bulundu!"
+}

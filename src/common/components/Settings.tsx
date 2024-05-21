@@ -1270,7 +1270,7 @@ const { Form, FormItem, useForm } = createForm<ISettings>()
 
 interface IInnerSettingsProps {
     showFooter?: boolean
-    onSave?: (oldSettings: ISettings) => void
+    onSave?: (oldSettings: ISettings, latestSettings: ISettings) => void
     headerPromotionID?: string
     openaiAPIKeyPromotionID?: string
 }
@@ -1415,7 +1415,7 @@ export function InnerSettings({
             })
             setLoading(false)
             setSettings(data)
-            onSave?.(oldSettings)
+            onSave?.(oldSettings, data)
         },
         [isTauri, onSave, setSettings, refreshThemeType, t]
     )

@@ -3,6 +3,9 @@
     windows_subsystem = "windows"
 )]
 
+#[macro_use]
+extern crate rust_i18n;
+
 mod config;
 mod fetch;
 mod lang;
@@ -69,6 +72,11 @@ fn get_update_result() -> (bool, Option<UpdateResult>) {
         return (false, None);
     }
     return (true, UPDATE_RESULT.lock().clone().unwrap());
+}
+
+#[tauri::command]
+fn update_locales(locales: Option<String>) -> () {
+    rust_i18n::set_locale(&locales.unwrap_or("en".to_string()));
 }
 
 #[cfg(target_os = "macos")]
@@ -276,6 +284,9 @@ fn bind_mouse_hook() {
     }
 }
 
+// Init translations for current crate.
+i18n!("locales", fallback = "en");
+
 fn main() {
     let silently = env::args().any(|arg| arg == "--silently");
 
@@ -323,7 +334,10 @@ fn main() {
         ))
         .plugin(tauri_plugin_process::init())
         .setup(move |app| {
-            let app_handle = app.handle();
+            let config = config::get_config_by_app(app.handle()).unwrap();
+            update_locales(config.i18n);
+
+            let app_handle: &AppHandle = app.handle();
             APP_HANDLE.get_or_init(|| app.handle().clone());
             tray::create_tray(&app_handle)?;
             app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
@@ -420,6 +434,7 @@ fn main() {
             finish_ocr,
             screenshot,
             hide_translator_window,
+            update_locales,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

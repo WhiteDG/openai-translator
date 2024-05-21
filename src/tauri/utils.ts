@@ -3,7 +3,6 @@ import { invoke } from '@tauri-apps/api/core'
 import { getSettings } from '@/common/utils'
 import { sendNotification } from '@tauri-apps/plugin-notification'
 import { Action } from '@/common/internal-services/db'
-import { emit } from '@tauri-apps/api/event'
 
 const modifierKeys = [
     'OPTION',
@@ -58,7 +57,6 @@ export async function bindDisplayWindowHotkey(oldHotKey?: string) {
     }
     const settings = await getSettings()
     if (!settings.displayWindowHotkey) {
-        emit('hotkey-updated', { id: 'show', hotkey: null })
         return
     }
     if (isMissingNormalKey(settings.displayWindowHotkey)) {
@@ -75,7 +73,6 @@ export async function bindDisplayWindowHotkey(oldHotKey?: string) {
         invoke('show_translator_window_command')
     }).then(() => {
         console.log('register display window hotkey success')
-        emit('hotkey-updated', { id: 'show', hotkey: settings.displayWindowHotkey })
     })
 }
 
@@ -85,7 +82,6 @@ export async function bindOCRHotkey(oldOCRHotKey?: string) {
     }
     const settings = await getSettings()
     if (!settings.ocrHotkey) {
-        emit('hotkey-updated', { id: 'ocr', hotkey: null })
         return
     }
     if (isMissingNormalKey(settings.ocrHotkey)) {
@@ -102,7 +98,6 @@ export async function bindOCRHotkey(oldOCRHotKey?: string) {
         invoke('ocr_command')
     }).then(() => {
         console.log('OCR hotkey registered')
-        emit('hotkey-updated', { id: 'ocr', hotkey: settings.ocrHotkey })
     })
 }
 
