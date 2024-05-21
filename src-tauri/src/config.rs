@@ -33,6 +33,7 @@ pub struct ProxyConfig {
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub hotkey: Option<String>,
+    pub display_window_hotkey: Option<String>,
     pub ocr_hotkey: Option<String>,
     pub writing_hotkey: Option<String>,
     pub writing_newline_hotkey: Option<String>,
