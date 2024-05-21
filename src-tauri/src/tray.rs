@@ -3,7 +3,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use crate::config::get_config;
 use crate::ocr::ocr;
 use crate::windows::{
-    set_translator_window_always_on_top, show_settings_window, show_updater_window
+    set_translator_window_always_on_top, show_settings_window, show_updater_window,
 };
 use crate::{ALWAYS_ON_TOP, UPDATE_RESULT};
 
@@ -36,7 +36,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
             .set_text(t!("NewVersionAvailable"))
             .unwrap();
     }
-    let settings_i = MenuItem::with_id(app, "settings",t!("Settings"), true, Some("CmdOrCtrl+,"))?;
+    let settings_i = MenuItem::with_id(app, "settings", t!("Settings"), true, Some("CmdOrCtrl+,"))?;
     let ocr_i = MenuItem::with_id(app, "ocr", t!("OCR"), true, config.ocr_hotkey)?;
     let show_i = MenuItem::with_id(app, "show", t!("Show"), true, config.display_window_hotkey)?;
     let hide_i = PredefinedMenuItem::hide(app, Some(t!("Hide").as_ref())).unwrap();
@@ -46,7 +46,7 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     }
     let separator_i = PredefinedMenuItem::separator(app).unwrap();
     let quit_i = PredefinedMenuItem::quit(app, Some(t!("Quit").as_ref())).unwrap();
-    
+
     let menu = Menu::with_items(
         app,
         &[

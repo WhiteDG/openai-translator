@@ -35,8 +35,7 @@ use crate::ocr::{cut_image, finish_ocr, ocr_command, screenshot};
 use crate::windows::{
     get_translator_window_always_on_top, hide_translator_window, show_action_manager_window,
     show_translator_window_command, show_translator_window_with_selected_text_command,
-    show_translator_window_with_selected_text_and_action_command,
-    show_updater_window, TRANSLATOR_WIN_NAME,
+    show_translator_window_with_selected_text_and_action_command, show_updater_window, TRANSLATOR_WIN_NAME,
 };
 use crate::writing::{finish_writing, write_to_input, writing_command};
 
