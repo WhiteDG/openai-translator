@@ -163,7 +163,6 @@ dependencies = [
  "tauri-plugin-single-instance",
  "tauri-plugin-updater",
  "text-diff",
- "time",
  "tiny_http",
  "tokio",
  "whatlang",
