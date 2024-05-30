@@ -13,6 +13,7 @@ use serde_json::json;
 use std::sync::atomic::Ordering;
 use tauri::{LogicalPosition, Manager, PhysicalPosition};
 use tauri_plugin_updater::UpdaterExt;
+use tauri_specta::Event;
 
 pub const TRANSLATOR_WIN_NAME: &str = "translator";
 pub const SETTINGS_WIN_NAME: &str = "settings";
@@ -106,17 +107,20 @@ pub fn set_translator_window_always_on_top() -> bool {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn get_translator_window_always_on_top() -> bool {
     ALWAYS_ON_TOP.load(Ordering::Acquire)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn show_translator_window_with_selected_text_and_action_command(action_id: String) {
     utils::send_action(action_id);
     show_translator_window_with_selected_text_command().await;
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn show_translator_window_with_selected_text_command() {
     let mut window = show_translator_window(false, true, false);
     let mut enigo = Enigo::new(&Settings::default()).unwrap();
@@ -168,6 +172,7 @@ pub fn do_hide_translator_window() {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn hide_translator_window() {
     do_hide_translator_window();
 }
@@ -342,6 +347,7 @@ pub fn build_window<'a, R: tauri::Runtime, M: tauri::Manager<R>>(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn show_translator_window_command() {
     show_translator_window(false, false, true);
 }
@@ -458,6 +464,7 @@ pub fn get_translator_window(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn show_action_manager_window() {
     let window = get_action_manager_window();
     window.center().unwrap();
@@ -529,32 +536,33 @@ pub fn get_settings_window() -> tauri::WebviewWindow {
     window
 }
 
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct CheckUpdateResultEvent(UpdateResult);
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct CheckUpdateEvent;
+
 pub fn show_updater_window() {
     let window = get_updater_window();
     window.center().unwrap();
     window.show().unwrap();
-    let window_clone = window.clone();
-    window.listen("check_update", move |event| {
-        let handle = APP_HANDLE.get().unwrap();
-        let window_clone = window_clone.clone();
+
+    let handle = APP_HANDLE.get().unwrap();
+    CheckUpdateEvent::listen(handle, move |event| {
+        let window_clone = window.clone();
         tauri::async_runtime::spawn(async move {
-            let mut builder = handle.updater_builder();
+            let builder = handle.updater_builder();
             let updater = builder.build().unwrap();
 
             match updater.check().await {
                 Ok(Some(update)) => {
-                    handle
-                        .emit(
-                            "update_result",
-                            json!({
-                                "result": UpdateResult {
-                                    version: update.version,
-                                    current_version: update.current_version,
-                                    body: update.body,
-                                }
-                            }),
-                        )
-                        .unwrap();
+                    CheckUpdateResultEvent(UpdateResult {
+                        version: update.version,
+                        current_version: update.current_version,
+                        body: update.body,
+                    })
+                    .emit(handle)
+                    .unwrap();
                 }
                 Ok(None) => {
                     handle
@@ -568,7 +576,7 @@ pub fn show_updater_window() {
                 }
                 Err(_) => {}
             }
-            window_clone.unlisten(event.id())
+            window_clone.unlisten(event.id)
         });
     });
 }

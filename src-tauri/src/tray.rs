@@ -106,9 +106,9 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         create_tray(&app_handle_clone).unwrap();
     });
 
-    let app_handle_clone_0 = app.app_handle().clone();
+    let app_handle_clone = app.app_handle().clone();
     app_handle.listen_any("refresh_menu", move |_event| {
-        create_tray(&app_handle_clone_0).unwrap();
+        create_tray(&app_handle_clone).unwrap();
     });
     Ok(())
 }
