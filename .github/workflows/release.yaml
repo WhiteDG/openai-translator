@@ -99,9 +99,9 @@ jobs:
           # - os: macos-latest
           #   arch: aarch64
           #   rust_target: aarch64-apple-darwin
-          # - os: windows-latest
-          #   arch: x86_64
-          #   rust_target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            arch: x86_64
+            rust_target: x86_64-pc-windows-msvc
 
     runs-on: ${{ matrix.config.os }}
     steps:
@@ -124,10 +124,11 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --no-frozen-lockfile # change this to npm or pnpm depending on which one you use
 
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
         with:
           targets: ${{ matrix.config.rust_target }}
+          toolchain: '1.78.0'
 
       - name: Install dependencies (ubuntu only)
         if: matrix.config.os == 'ubuntu-latest'
