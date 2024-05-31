@@ -46,7 +46,7 @@ export function Window(props: IWindowProps) {
                 if (event.key === 'Escape') {
                     event.preventDefault()
                     if (isTauri()) {
-                        invoke('hide_translator_window')
+                        commands.hideTranslatorWindow()
                     }
                 }
             }
