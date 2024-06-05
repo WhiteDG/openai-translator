@@ -76,7 +76,9 @@ export function TranslatorWindow() {
         }
     }, [writingFlag])
 
-    useMemoWindow({ size: true, position: false })
+    const { settings } = useSettings()
+
+    useMemoWindow({ size: true, position: false, show: !settings.runAtStartup })
 
     useEffect(() => {
         setupAnalysis()
@@ -112,8 +114,6 @@ export function TranslatorWindow() {
             unlisten?.()
         }
     }, [])
-
-    const { settings } = useSettings()
 
     useEffect(() => {
         if (!settings?.writingTargetLanguage) {
