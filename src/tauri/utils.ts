@@ -2,9 +2,8 @@ import { isRegistered, register, unregister } from '@tauri-apps/plugin-global-sh
 import { getSettings } from '@/common/utils'
 import { sendNotification } from '@tauri-apps/plugin-notification'
 import { Action } from '@/common/internal-services/db'
-import { commands } from './bindings'
+import { commands, events } from './bindings'
 import { ISettings } from '@/common/types'
-import { emit } from '@tauri-apps/api/event'
 
 const modifierKeys = [
     'OPTION',
@@ -150,13 +149,12 @@ export async function bindActionHotkey(action: Action, oldActionHotKey?: string)
 }
 
 export function onSettingsSave(oldSettings: ISettings, latestSettings: ISettings) {
-    commands.clearConfigCache()
+    if (latestSettings.i18n !== oldSettings.i18n) {
+        commands.updateLocales(latestSettings.i18n || 'en')
+    }
+    events.configUpdatedEvent.emit()
     bindHotkey(oldSettings.hotkey)
     bindDisplayWindowHotkey(oldSettings.displayWindowHotkey)
     bindOCRHotkey(oldSettings.ocrHotkey)
     bindWritingHotkey(oldSettings.writingHotkey)
-    if (latestSettings.i18n !== oldSettings.i18n) {
-        commands.updateLocales(latestSettings.i18n || 'en')
-    }
-    emit('refresh_menu')
 }

@@ -8,16 +8,27 @@ use crate::windows::{
 use crate::{ALWAYS_ON_TOP, UPDATE_RESULT};
 
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::ClickType,
     Manager, Runtime,
 };
+use tauri_specta::Event;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub(crate) struct PinnedEventPayload {
+#[derive(Serialize, Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct PinnedFromTrayEvent {
     pinned: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct PinnedFromWindowEvent {
+    pinned: bool,
+}
+
+impl PinnedFromWindowEvent {
+    pub fn pinned(&self) -> &bool {
+        &self.pinned
+    }
 }
 
 pub static TRAY_EVENT_REGISTERED: AtomicBool = AtomicBool::new(false);
@@ -44,9 +55,8 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     if ALWAYS_ON_TOP.load(Ordering::Acquire) {
         pin_i.set_text(t!("Unpin")).unwrap();
     }
-    let separator_i = PredefinedMenuItem::separator(app).unwrap();
     let quit_i = PredefinedMenuItem::quit(app, Some(t!("Quit").as_ref())).unwrap();
-
+    let separator_i = PredefinedMenuItem::separator(app)?;
     let menu = Menu::with_items(
         app,
         &[
@@ -84,9 +94,8 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         "pin" => {
             let pinned = set_translator_window_always_on_top();
             let handle = app.app_handle();
-            handle
-                .emit("pinned-from-tray", json!({ "pinned": pinned }))
-                .unwrap_or_default();
+            let pinned_from_tray_event = PinnedFromTrayEvent { pinned };
+            pinned_from_tray_event.emit(handle).unwrap_or_default();
             create_tray(app).unwrap();
         }
         "quit" => app.exit(0),
@@ -98,17 +107,6 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
         }
     });
     tray.set_show_menu_on_left_click(false)?;
-    let app_handle = app.app_handle();
-    let app_handle_clone = app.app_handle().clone();
-    app_handle.listen_any("pinned-from-window", move |msg| {
-        let payload: PinnedEventPayload = serde_json::from_str(&msg.payload()).unwrap();
-        ALWAYS_ON_TOP.store(payload.pinned, Ordering::Release);
-        create_tray(&app_handle_clone).unwrap();
-    });
 
-    let app_handle_clone = app.app_handle().clone();
-    app_handle.listen_any("refresh_menu", move |_event| {
-        create_tray(&app_handle_clone).unwrap();
-    });
     Ok(())
 }

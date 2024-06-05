@@ -6,6 +6,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::APP_HANDLE;
 
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, specta::Type, tauri_specta::Event)]
+pub struct ConfigUpdatedEvent;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ProxyProtocol {
     HTTP,
