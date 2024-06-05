@@ -541,6 +541,7 @@ fn main() {
 
             api.prevent_close();
         }
+        #[cfg(target_os = "macos")]
         tauri::RunEvent::Reopen {
             has_visible_windows,
             ..
