@@ -57,7 +57,7 @@ export const useMemoWindow = (props: WindowMemoProps) => {
             }
         }
         initWindow()
-    }, [props.position, props.show, props.size])
+    }, [props.position, props.size, props.show])
 
     useEffect(() => {
         const appWindow = getCurrent()
